@@ -12,7 +12,10 @@ jQuery(function ($) {
 	} else {
 		var numParticles = 100;
 		var twitterUpdateInterval = 15 * 1000;
-		var displayTweetInterval = 4 * 1000;
+		var displayTweetInterval = 10 * 1000;
+		var tweetFadeAfterInterval = 8 * 1000;
+		var tweetFadeInDelay = 1000;
+		var tweetFateOutDelay = 2000;
 		var i;
 		var el = document.getElementById("theapt");	
 		var width = window.innerWidth;
@@ -238,8 +241,17 @@ jQuery(function ($) {
 						impulsX = Math.random()*800-400;
 						impulsY = -Math.random()*400;
 
-						var transIndex = Math.floor(Math.random()*transitions.length);
+						// last transition (heart) is special
+						var transIndex = Math.floor(Math.random()*(transitions.length-1));
+						
+						// show heart with new tweet <3
+						if( newTweetWillShow() )
+							transIndex = 4;
+
 						transitions[transIndex]();
+						
+						dequeueAndDisplayTweets();
+
 					}				
 				},
 				draw: function () {	
@@ -286,7 +298,7 @@ jQuery(function ($) {
 			//counter++;
 
 			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>');
-			$('#tweet').show();
+			$('#tweet').show(tweetFadeInDelay);
 
 			$('a').css('color', 'rgb(' + Math.floor(pixels[i].r) + ',' + Math.floor(pixels[i].g) + ',' + Math.floor(pixels[i].b) + ')');
 	    }
@@ -407,20 +419,53 @@ jQuery(function ($) {
     		}
 		};
 
+		var hideTweet = function()
+		{
+			$("#tweet").hide(tweetFateOutDelay);
+			if(focusedParticleIndex != null) {
+				pixels[focusedParticleIndex].flightMode = 0;
+				pixels[focusedParticleIndex].toSize = Math.random()*10+1;
+			} 
+		};
+
+
+		var lastTweet = new Date();
+
+		var newTweetWillShow = function()
+		{
+			if( tweetQueue == undefined )
+				return false;
+
+			if( tweetQueue.length == 0 )
+				return false;
+
+			var timeNow = new Date();
+			if( timeNow - lastTweet > displayTweetInterval )
+				return true;
+		};
+
+		
 		var dequeueAndDisplayTweets = function()
 		{
-			if( tweetQueue != undefined )
+			if( tweetQueue == undefined )
+				return;
+
+			if( tweetQueue.length == 0 )
+				return;
+
+			var timeNow = new Date();
+			if( timeNow - lastTweet > displayTweetInterval )
 			{
-				if( tweetQueue.length > 0 )
-				{
-					var newTweet = tweetQueue.pop();
+				lastTweet = new Date();
 
-			    	chooseRandomParticle();
-					displayTweet(newTweet, focusedParticleIndex);
-				}
-			}
+				var newTweet = tweetQueue.pop();
 
-			setTimeout(dequeueAndDisplayTweets, displayTweetInterval);
+		    	chooseRandomParticle();
+				displayTweet(newTweet, focusedParticleIndex);
+
+				setTimeout(hideTweet, tweetFadeAfterInterval);
+			}//time
+			
 		};
 
 		//var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
@@ -458,7 +503,7 @@ jQuery(function ($) {
 		downloadTweets();
 
 		// Start self looping tweet display
-		dequeueAndDisplayTweets();
+		//dequeueAndDisplayTweets();
 
 		
 		
