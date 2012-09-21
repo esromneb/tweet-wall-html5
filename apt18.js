@@ -281,6 +281,32 @@ jQuery(function ($) {
 			$('a').css('color', 'rgb(' + Math.floor(pixels[i].r) + ',' + Math.floor(pixels[i].g) + ',' + Math.floor(pixels[i].b) + ')');
 	    }
 
+	    var chooseRandomParticle=function()
+	    {
+	    	// set a random pixel to mode 1, so loop below will catch it
+	    	var anotherIndex = Math.floor( Math.random()*numParticles );
+	    	pixels[anotherIndex].flightMode = 1;
+
+			if(focusedParticleIndex != null) {
+				pixels[focusedParticleIndex].flightMode = 0;
+				pixels[focusedParticleIndex].toSize = Math.random()*10+1;
+			} 
+			for(var i = 0; i<numParticles; i++ ) {
+				if(pixels[i].flightMode == 1) {
+					pixels[i].flightMode = 2;
+
+					pixels[i].toSize = 100;
+					pixels[i].toX = 200;
+					pixels[i].toY = height/2;
+
+					focusedParticleIndex = i;
+
+					// abort for loop
+					i = numParticles;
+				}
+			}
+	    }
+
 		p.mousePressed = function() {
 			var d = new Date().getTime() - startedAt.getTime();
 	/*		events.push(d);
