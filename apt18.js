@@ -11,11 +11,12 @@ jQuery(function ($) {
 		jQuery('#tweet').html('<h1>oh noez - please get yourself a sophisticated browser like <a href="http://getfirefox.com">FireFox 3.5</a>, <a href="http://apple.com/safari">Safari</a>, <a href="http://www.opera.com/">Opera</a> or <a href="http://google.com/chrome">Chrome</a> </h1>');
 	} else {
 		var numParticles = 100;
-		var twitterUpdateInterval = 15 * 1000;
-		var displayTweetInterval = 10 * 1000;
+		var twitterUpdateInterval = 4 * 1000;
+		var displayTweetInterval = 11 * 1000;
 		var tweetFadeAfterInterval = 8 * 1000;
 		var tweetFadeInDelay = 1000;
 		var tweetFateOutDelay = 2000;
+		var timeToReuseTweets = 30 * 1000;
 		var i;
 		var el = document.getElementById("theapt");	
 		var width = window.innerWidth;
@@ -288,7 +289,36 @@ jQuery(function ($) {
 	      my = p.mouseY;
 	    }
 
-	    var displayTweet=function(randomTweet, i)
+	    function parseTwitterDate(tdate) {
+		    var system_date = new Date(Date.parse(tdate));
+		    var user_date = new Date();
+		    if (K.ie) {
+		        system_date = Date.parse(tdate.replace(/( \+)/, ' UTC$1'))
+		    }
+		    var diff = Math.floor((user_date - system_date) / 1000);
+		    if (diff <= 1) {return "just now";}
+		    if (diff < 20) {return diff + " seconds ago";}
+		    if (diff < 40) {return "half a minute ago";}
+		    if (diff < 60) {return "less than a minute ago";}
+		    if (diff <= 90) {return "one minute ago";}
+		    if (diff <= 3540) {return Math.round(diff / 60) + " minutes ago";}
+		    if (diff <= 5400) {return "1 hour ago";}
+		    if (diff <= 86400) {return Math.round(diff / 3600) + " hours ago";}
+		    if (diff <= 129600) {return "1 day ago";}
+		    if (diff < 604800) {return Math.round(diff / 86400) + " days ago";}
+		    if (diff <= 777600) {return "1 week ago";}
+		    return "on " + system_date;
+		}
+
+		// from http://widgets.twimg.com/j/1/widget.js
+		var K = function () {
+		    var a = navigator.userAgent;
+		    return {
+		        ie: a.match(/MSIE\s([^;]*)/)
+		    }
+		}();
+
+	    var displayTweet=function(randomTweet, i, isNew, number )
 	    {
 			var text = randomTweet.text.replace(/http:\/\/(\S+)/, "<a href=\"http://$1\">http://$1</a>");
 			text = text.replace(/@(\S+)/, "<a href=\"http://twitter.com/$1\">@$1</a>");
@@ -297,7 +327,11 @@ jQuery(function ($) {
 			//jQuery('#tweets').append(el);
 			//counter++;
 
-			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>');
+			var oldText = "";
+			if( !isNew )
+				oldText = ' ( ' + number + ' of ' + allTweets.length + ' oldish tweets)';
+
+			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>' + '<h2>' + parseTwitterDate(randomTweet.created_at) + oldText + '</h2>');
 			$('#tweet').show(tweetFadeInDelay);
 
 			$('a').css('color', 'rgb(' + Math.floor(pixels[i].r) + ',' + Math.floor(pixels[i].g) + ',' + Math.floor(pixels[i].b) + ')');
@@ -349,7 +383,7 @@ jQuery(function ($) {
 
 					var randomTweet = theTweets[Math.floor(Math.random()*theTweets.length)];
 
-					displayTweet(randomTweet, i);
+					displayTweet(randomTweet, i, false, 0);
 
 					
 
@@ -406,7 +440,7 @@ jQuery(function ($) {
     			if( seenTweets[thisTweet.id] )
     			{
     				//console.log("yes");
-    				console.log("already seen" + thisTweet.text );
+    				//console.log("already seen" + thisTweet.text );
     			}
     			else
     			{
@@ -419,13 +453,18 @@ jQuery(function ($) {
     		}
 		};
 
-		var hideTweet = function()
+		var hideParticle = function()
 		{
-			$("#tweet").hide(tweetFateOutDelay);
 			if(focusedParticleIndex != null) {
 				pixels[focusedParticleIndex].flightMode = 0;
 				pixels[focusedParticleIndex].toSize = Math.random()*10+1;
 			} 
+		}
+
+		var hideTweet = function()
+		{
+			$("#tweet").hide(tweetFateOutDelay);
+			setTimeout(hideParticle, tweetFateOutDelay/2);
 		};
 
 
@@ -450,26 +489,44 @@ jQuery(function ($) {
 			if( tweetQueue == undefined )
 				return;
 
-			if( tweetQueue.length == 0 )
-				return;
-
 			var timeNow = new Date();
-			if( timeNow - lastTweet > displayTweetInterval )
+
+
+			if( tweetQueue.length != 0 && timeNow - lastTweet > displayTweetInterval )
 			{
 				lastTweet = new Date();
 
 				var newTweet = tweetQueue.pop();
 
 		    	chooseRandomParticle();
-				displayTweet(newTweet, focusedParticleIndex);
-
+				displayTweet(newTweet, focusedParticleIndex, true, 0);
 				setTimeout(hideTweet, tweetFadeAfterInterval);
+				return;
 			}//time
+
+			
+
+			if( tweetQueue.length == 0 && timeNow - lastTweet > timeToReuseTweets )
+			{
+				lastTweet = new Date();
+
+				// display an old tweet at random
+				var oldIndex = Math.floor( Math.random() * allTweets.length );
+				var oldTweet = allTweets[oldIndex];
+
+				chooseRandomParticle();
+				displayTweet(oldTweet, focusedParticleIndex, false, oldIndex);
+				setTimeout(hideTweet, tweetFadeAfterInterval);
+			}
+
+			
+
 			
 		};
 
-		//var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
-		var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
+		var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
+		var searchUrl = 'http://search.twitter.com/search.json?q=%23myhash';
+		//var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
 
 		// start
 
