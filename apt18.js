@@ -11,6 +11,8 @@ jQuery(function ($) {
 		jQuery('#tweet').html('<h1>oh noez - please get yourself a sophisticated browser like <a href="http://getfirefox.com">FireFox 3.5</a>, <a href="http://apple.com/safari">Safari</a>, <a href="http://www.opera.com/">Opera</a> or <a href="http://google.com/chrome">Chrome</a> </h1>');
 	} else {
 		var numParticles = 100;
+		var twitterUpdateInterval = 15 * 1000;
+		var displayTweetInterval = 4 * 1000;
 		var i;
 		var el = document.getElementById("theapt");	
 		var width = window.innerWidth;
@@ -225,6 +227,14 @@ jQuery(function ($) {
 					now = new Date();
 					if(now.getTime() - startedAt.getTime() >= machine[machineIndex]) {
 						machineIndex++;
+
+						// restart time
+						if( machineIndex > machine.length )
+						{
+							machineIndex = 0;
+							startedAt = new Date();
+						}
+
 						impulsX = Math.random()*800-400;
 						impulsY = -Math.random()*400;
 
@@ -371,6 +381,7 @@ jQuery(function ($) {
 
 		var seenTweets = new Array();
 		var tweetQueue = new Array();
+		var allTweets = new Array();
 
 		var newTweets = function(data)
 		{
@@ -379,6 +390,7 @@ jQuery(function ($) {
     		{	
     			var thisTweet = results[i];
 
+    			// have we seen this before?
     			if( seenTweets[thisTweet.id] )
     			{
     				//console.log("yes");
@@ -386,11 +398,8 @@ jQuery(function ($) {
     			}
     			else
     			{
-    				//tweetQueue.push(thisTweet);
-    				chooseRandomParticle();
-    				console.log("particle " + focusedParticleIndex);
-    				displayTweet(thisTweet, 3);
-    				break;
+    				allTweets.push(thisTweet);
+    				tweetQueue.push(thisTweet);
     			}
 
 
@@ -398,14 +407,29 @@ jQuery(function ($) {
     		}
 		};
 
-		var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
-		//var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
+		var dequeueAndDisplayTweets = function()
+		{
+			if( tweetQueue != undefined )
+			{
+				if( tweetQueue.length > 0 )
+				{
+					var newTweet = tweetQueue.pop();
+
+			    	chooseRandomParticle();
+					displayTweet(newTweet, focusedParticleIndex);
+				}
+			}
+
+			setTimeout(dequeueAndDisplayTweets, displayTweetInterval);
+		};
+
+		//var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
+		var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
 
 		// start
 
 		var downloadTweets = function()
 		{
-
 			jQuery.ajax({
 		        url: searchUrl,
 		        dataType: 'jsonp',
@@ -414,19 +438,29 @@ jQuery(function ($) {
 					newTweets(data);
 
 					setTimeout(function() {
-						startedAt = new Date();
+
+						if( startedAt == undefined )
+							startedAt = new Date();
+
 						$('#audio').hide();
 						//$('#tweet').hide();
 						play = true;
 					}, 100);
 		        }
 		    });
+
+			setTimeout(downloadTweets, twitterUpdateInterval);
+
 		}; //downloadTweets
 
-		//downloadTweets();
 
-		setTimeout(downloadTweets, 0);
-		setTimeout(downloadTweets, 3000);
+		// Start self looping twitter
+		downloadTweets();
+
+		// Start self looping tweet display
+		dequeueAndDisplayTweets();
+
+		
 		
 	}// main code (else if bad browser)
 });
