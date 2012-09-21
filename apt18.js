@@ -329,7 +329,7 @@ jQuery(function ($) {
 
 			var oldText = "";
 			if( !isNew )
-				oldText = ' ( ' + number + ' of ' + allTweets.length + ' oldish tweets)';
+				oldText = ' (' + number + ' of ' + allTweets.length + ' older tweets)';
 
 			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>' + '<h2>' + parseTwitterDate(randomTweet.created_at) + oldText + '</h2>');
 			$('#tweet').show(tweetFadeInDelay);
@@ -364,6 +364,10 @@ jQuery(function ($) {
 	    }
 
 		p.mousePressed = function() {
+
+			// clicking fast forwards tweets
+			tweetQueue.pop();
+
 			var d = new Date().getTime() - startedAt.getTime();
 	/*		events.push(d);
 			console.log(events); */
@@ -431,6 +435,7 @@ jQuery(function ($) {
 
 		var newTweets = function(data)
 		{
+			var fastForwardTweet = 0;
 			var results = data.results;
 			for( var i = 0; i < results.length; i++ )
     		{	
@@ -446,6 +451,22 @@ jQuery(function ($) {
     			{
     				allTweets.push(thisTweet);
     				tweetQueue.push(thisTweet);
+
+    				// fast forward a single tweet
+    				if(fastForwardTweet == 0)
+    				{
+    					fastForwardTweet = 1;
+
+    					// Hide any exisiting tweet
+    					$("#tweet").hide();
+    					// clear any timeout of fading from previous tweets
+    					if(hideTweetTimer) clearTimeout(hideTweetTimer);
+
+    					// set last tweet in the past and display
+    					// next tweet will be displayed by main render loop above and get a <3
+    					lastTweet = new Date(2010, 1, 1);
+    				}
+
     			}
 
 
@@ -461,10 +482,11 @@ jQuery(function ($) {
 			} 
 		}
 
+		var hideTweetTimer;
 		var hideTweet = function()
 		{
 			$("#tweet").hide(tweetFateOutDelay);
-			setTimeout(hideParticle, tweetFateOutDelay/2);
+			hideTweetTimer = setTimeout(hideParticle, tweetFateOutDelay/2);
 		};
 
 
