@@ -232,7 +232,7 @@ jQuery(function ($) {
 						machineIndex++;
 
 						// restart time
-						if( machineIndex > machine.length )
+						if( machineIndex >= machine.length )
 						{
 							machineIndex = 0;
 							startedAt = new Date();
