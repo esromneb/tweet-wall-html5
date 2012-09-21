@@ -437,6 +437,10 @@ jQuery(function ($) {
 		{
 			var fastForwardTweet = 0;
 			var results = data.results;
+
+			if( results == undefined )
+				return;
+
 			for( var i = 0; i < results.length; i++ )
     		{	
     			var thisTweet = results[i];
