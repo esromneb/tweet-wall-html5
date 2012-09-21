@@ -31,7 +31,7 @@ jQuery(function ($) {
 		var startedAt;
 		var now;
 	//	var machine = [6775, 10217, 13583, 16967, 20375, 23777, 27113, 30466, 33842, 37209, 40651, 43992, 47371, 50659, 55091, 57497, 60840, 64245, 67580, 71863, 74326, 77769, 81233, 84448, 87838, 91228, 94558, 98394];
-		var machine = [13094, 13653, 15132, 16624, 18137, 19629, 21172, 22629, 24140, 25631, 27140, 28728, 30108, 31633, 33142, 34656, 36134, 37636, 39152, 40668, 42131, 43596, 45170, 46619, 48147, 49642, 51163, 52626, 54220, 55669, 57149, 58617, 60118, 61572, 63064, 64549, 66134, 67616, 70573, 72115, 73594, 75107, 76604, 78117, 79628, 81125, 82628, 84161, 85644, 87213, 88651, 90194, 91673, 93248, 94668, 96147, 97629, 99173, 100637, 102242, 103692, 105236, 106636, 108182, 109587, 111148, 112630, 114060, 115637, 117069, 118042, 120172, 121676, 123254, 124577, 126202, 127817, 129686, 132052, 133604, 135179, 136652, 138187, 139609, 141084, 142571, 144084, 145603, 147180, 148573, 150142, 151820, 153211, 154567, 156097, 157597, 159110, 160595, 162149, 163617, 165123, 166565, 168089, 169603, 171215, 173446, 175598, 177048, 178490, 180269, 181616, 184604, 189284, 192782, 195827, 198787, 201856, 204867, 207819, 211191, 213709, 216808, 219764, 222804, 225795, 228737, 229605, 231068, 232588, 234106, 235611, 237056, 238591, 240083, 241606, 243091, 244580];
+		var machine = [6775, 10217, 13094, 13653, 15132, 16624, 18137, 19629, 21172, 22629, 24140, 25631, 27140, 28728, 30108, 31633, 33142, 34656, 36134, 37636, 39152, 40668, 42131, 43596, 45170, 46619, 48147, 49642, 51163, 52626, 54220, 55669, 57149, 58617, 60118, 61572, 63064, 64549, 66134, 67616, 70573, 72115, 73594, 75107, 76604, 78117, 79628, 81125, 82628, 84161, 85644, 87213, 88651, 90194, 91673, 93248, 94668, 96147, 97629, 99173, 100637, 102242, 103692, 105236, 106636, 108182, 109587, 111148, 112630, 114060, 115637, 117069, 118042, 120172, 121676, 123254, 124577, 126202, 127817, 129686, 132052, 133604, 135179, 136652, 138187, 139609, 141084, 142571, 144084, 145603, 147180, 148573, 150142, 151820, 153211, 154567, 156097, 157597, 159110, 160595, 162149, 163617, 165123, 166565, 168089, 169603, 171215, 173446, 175598, 177048, 178490, 180269, 181616, 184604, 189284, 192782, 195827, 198787, 201856, 204867, 207819, 211191, 213709, 216808, 219764, 222804, 225795, 228737, 229605, 231068, 232588, 234106, 235611, 237056, 238591, 240083, 241606, 243091, 244580];
 		var machineIndex = 0;
 		var events = [];
 		var play = false;
@@ -556,51 +556,50 @@ jQuery(function ($) {
 				displayTweet(oldTweet, focusedParticleIndex, false, oldIndex);
 				setTimeout(hideTweet, tweetFadeAfterInterval);
 			}
-
-			
-
-			
 		};
 
-		//var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
-		var searchUrl = 'http://search.twitter.com/search.json?include_entities=true&q=%23myhash';
-		//var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
 
-		// start
+		var searchUrls = new Array();
+
+
+
+
+		searchUrls.push('http://search.twitter.com/search.json?include_entities=true&q=%23joynme992');
+		searchUrls.push('http://search.twitter.com/search.json?include_entities=true&q=%40joynme');
+		 
+	
+
 
 		var downloadTweets = function()
 		{
-			jQuery.ajax({
-		        url: searchUrl,
-		        dataType: 'jsonp',
-		        success: function (data) {
-					theTweets = data.results;
-					newTweets(data);
+			for( var i = 0; i < searchUrls.length; i++ )
+    		{	
+    			var url = searchUrls[i];
 
-					setTimeout(function() {
+				jQuery.ajax({
+			        url: url,
+			        dataType: 'jsonp',
+			        success: function (data) {
+						theTweets = data.results;
+						newTweets(data);
 
-						if( startedAt == undefined )
-							startedAt = new Date();
+						setTimeout(function() {
 
-						$('#audio').hide();
-						//$('#tweet').hide();
-						play = true;
-					}, 100);
-		        }
-		    });
-
+							if( startedAt == undefined )
+								startedAt = new Date();
+							
+							//$('#tweet').hide();
+							play = true;
+						}, 100);
+			        }
+			    });
+			} //for
 			setTimeout(downloadTweets, twitterUpdateInterval);
-
 		}; //downloadTweets
 
 
 		// Start self looping twitter
 		downloadTweets();
 
-		// Start self looping tweet display
-		//dequeueAndDisplayTweets();
-
-		
-		
 	}// main code (else if bad browser)
 });
