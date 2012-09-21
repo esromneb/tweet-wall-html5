@@ -38,10 +38,10 @@
 		font-family:Helvetica, Arial;
 		position:absolute;
 				
-		top:400px;
+		top:-10px;
 		left:260px;
-		
-		width:640px;
+		z-index: 10;
+		/*width:640px;*/
 	}
 	
 	#tweet h1 {
@@ -52,13 +52,26 @@
 		color:#fff;
 		margin:0 0 10px 0;
 		padding:0;
+		z-index: 10;
 	}
 	
 	#tweet strong {
 		display:block;
 		font-size:16px;
 	}
-	
+
+	#tweetImage {
+	 	margin-right: 0px;
+	 	position: absolute;
+		z-index: -1;
+		top:-350px;
+		right:-200px;
+
+		/*max-width: 600px;*/
+		max-height: 600px;
+	}
+
+
 	#about {
 		font-size:11px;
 		position:absolute;
@@ -141,11 +154,6 @@
 <canvas id="theapt" width="100" height="100"></canvas>
 <div id="tweet">
 	LOADING
-</div>
-<div id="stuff">
-	<audio id="audio">  
-		Your browser does not support the <code>audio</code> element.  
-	</audio>
 </div>
 
 <div id="watchlater">

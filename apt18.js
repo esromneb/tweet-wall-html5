@@ -326,12 +326,24 @@ jQuery(function ($) {
 			//var el = jQuery('<li><div class="content bubble_' + counter + '"><p>' + text + '</p></div><div class="user"><img src="' + data.results[i].profile_image_url + '" width="48" height="48" /> <a href="http://twitter.com/' + data.results[i].from_user + '">' + data.results[i].from_user + '</a></div></li>');
 			//jQuery('#tweets').append(el);
 			//counter++;
+			var img;
+			try {
+		        if (randomTweet.entities.media) {
+		            img = '<div id="tweetImage"><a href="' + randomTweet.entities.media[0].media_url + ':large" class="fancy">';
+		            img += '<img src="' + randomTweet.entities.media[0].media_url + ':medium" height="800" alt="" />';
+		            img += '</a></div>';
+		        } else {
+		            img = '';
+		        }
+		    } catch (e) {
+		        //e
+		    }
 
 			var oldText = "";
 			if( !isNew )
 				oldText = ' (' + number + ' of ' + allTweets.length + ' older tweets)';
 
-			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>' + '<h2>' + parseTwitterDate(randomTweet.created_at) + oldText + '</h2>');
+			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>' + '<h2>' + parseTwitterDate(randomTweet.created_at) + oldText + '</h2>' + img);
 			$('#tweet').show(tweetFadeInDelay);
 
 			$('a').css('color', 'rgb(' + Math.floor(pixels[i].r) + ',' + Math.floor(pixels[i].g) + ',' + Math.floor(pixels[i].b) + ')');
@@ -550,8 +562,8 @@ jQuery(function ($) {
 			
 		};
 
-		var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
-		var searchUrl = 'http://search.twitter.com/search.json?q=%23myhash';
+		//var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
+		var searchUrl = 'http://search.twitter.com/search.json?include_entities=true&q=%23myhash';
 		//var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
 
 		// start
