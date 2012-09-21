@@ -335,41 +335,22 @@ jQuery(function ($) {
 		$('#tweet').css('MozUserSelect', 'none');
 		$('#tweet').css('KhtmlUserSelect', 'none');
 
-		// start the experiment
-		if(false) {
-			// start if enought data is loaded			
-			$('#audio').bind('canplay', function() {
-				jQuery.ajax({
-			        url: 'http://search.twitter.com/search.json?rpp=100&q=html5+love',
-			        dataType: 'jsonp',
-			        success: function (data) {
-						theTweets = data.results;
 
-						setTimeout(function() {
-							startedAt = new Date();
-							$('#audio').get(0).play();
-							$('#tweet').hide();
-							play = true;
-						}, 100);
-			        }
-			    });		
-			});
-		} else {
-			// start without audio
-			jQuery.ajax({
-		        url: 'http://search.twitter.com/search.json?rpp=100&q=html5+love',
-		        dataType: 'jsonp',
-		        success: function (data) {
-					theTweets = data.results;
+		// start without audio
+		jQuery.ajax({
+	        url: 'http://search.twitter.com/search.json?q=%23joynme922',
+	        dataType: 'jsonp',
+	        success: function (data) {
+				theTweets = data.results;
 
-					setTimeout(function() {
-						startedAt = new Date();
-						$('#audio').hide();
-						$('#tweet').hide();
-						play = true;
-					}, 100);
-		        }
-		    });
-		}
+				setTimeout(function() {
+					startedAt = new Date();
+					$('#audio').hide();
+					$('#tweet').hide();
+					play = true;
+				}, 100);
+	        }
+	    });
+		
 	}
 });
