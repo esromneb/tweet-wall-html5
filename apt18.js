@@ -266,6 +266,21 @@ jQuery(function ($) {
 	      my = p.mouseY;
 	    }
 
+	    var displayTweet=function(randomTweet, i)
+	    {
+			var text = randomTweet.text.replace(/http:\/\/(\S+)/, "<a href=\"http://$1\">http://$1</a>");
+			text = text.replace(/@(\S+)/, "<a href=\"http://twitter.com/$1\">@$1</a>");
+
+			//var el = jQuery('<li><div class="content bubble_' + counter + '"><p>' + text + '</p></div><div class="user"><img src="' + data.results[i].profile_image_url + '" width="48" height="48" /> <a href="http://twitter.com/' + data.results[i].from_user + '">' + data.results[i].from_user + '</a></div></li>');
+			//jQuery('#tweets').append(el);
+			//counter++;
+
+			$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>');
+			$('#tweet').show();
+
+			$('a').css('color', 'rgb(' + Math.floor(pixels[i].r) + ',' + Math.floor(pixels[i].g) + ',' + Math.floor(pixels[i].b) + ')');
+	    }
+
 		p.mousePressed = function() {
 			var d = new Date().getTime() - startedAt.getTime();
 	/*		events.push(d);
@@ -286,17 +301,9 @@ jQuery(function ($) {
 
 					var randomTweet = theTweets[Math.floor(Math.random()*theTweets.length)];
 
-					var text = randomTweet.text.replace(/http:\/\/(\S+)/, "<a href=\"http://$1\">http://$1</a>");
-					text = text.replace(/@(\S+)/, "<a href=\"http://twitter.com/$1\">@$1</a>");
+					displayTweet(randomTweet, i);
 
-					//var el = jQuery('<li><div class="content bubble_' + counter + '"><p>' + text + '</p></div><div class="user"><img src="' + data.results[i].profile_image_url + '" width="48" height="48" /> <a href="http://twitter.com/' + data.results[i].from_user + '">' + data.results[i].from_user + '</a></div></li>');
-					//jQuery('#tweets').append(el);
-					//counter++;
-
-					$('#tweet').html('<h1>' + text + '</h1><strong><a href="http://twitter.com/' + randomTweet.from_user + '"><img src="' + randomTweet.profile_image_url + '" width="20" height="20" border="0" /> ' + randomTweet.from_user + '</a></strong>');
-					$('#tweet').show();
-
-					$('a').css('color', 'rgb(' + Math.floor(pixels[i].r) + ',' + Math.floor(pixels[i].g) + ',' + Math.floor(pixels[i].b) + ')');
+					
 
 					// abort for loop
 					i = numParticles;
@@ -336,12 +343,19 @@ jQuery(function ($) {
 		$('#tweet').css('KhtmlUserSelect', 'none');
 
 
+		var seenTweets = new Array();
+		var newTweets = function(data)
+		{
+
+		}
+
 		// start without audio
 		jQuery.ajax({
 	        url: 'http://search.twitter.com/search.json?q=%23joynme922',
 	        dataType: 'jsonp',
 	        success: function (data) {
 				theTweets = data.results;
+				//newTweets(data.results);
 
 				setTimeout(function() {
 					startedAt = new Date();
@@ -352,5 +366,5 @@ jQuery(function ($) {
 	        }
 	    });
 		
-	}
+	}// main code (else if bad browser)
 });
