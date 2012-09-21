@@ -370,27 +370,63 @@ jQuery(function ($) {
 
 
 		var seenTweets = new Array();
+		var tweetQueue = new Array();
+
 		var newTweets = function(data)
 		{
+			var results = data.results;
+			for( var i = 0; i < results.length; i++ )
+    		{	
+    			var thisTweet = results[i];
 
-		}
+    			if( seenTweets[thisTweet.id] )
+    			{
+    				//console.log("yes");
+    				console.log("already seen" + thisTweet.text );
+    			}
+    			else
+    			{
+    				//tweetQueue.push(thisTweet);
+    				chooseRandomParticle();
+    				console.log("particle " + focusedParticleIndex);
+    				displayTweet(thisTweet, 3);
+    				break;
+    			}
 
-		// start without audio
-		jQuery.ajax({
-	        url: 'http://search.twitter.com/search.json?q=%23joynme922',
-	        dataType: 'jsonp',
-	        success: function (data) {
-				theTweets = data.results;
-				//newTweets(data.results);
 
-				setTimeout(function() {
-					startedAt = new Date();
-					$('#audio').hide();
-					$('#tweet').hide();
-					play = true;
-				}, 100);
-	        }
-	    });
+    			seenTweets[thisTweet.id] = 1;
+    		}
+		};
+
+		var searchUrl = 'http://search.twitter.com/search.json?q=%23joynme922';
+		//var searchUrl = 'http://search.twitter.com/search.json?q=%23apple';
+
+		// start
+
+		var downloadTweets = function()
+		{
+
+			jQuery.ajax({
+		        url: searchUrl,
+		        dataType: 'jsonp',
+		        success: function (data) {
+					theTweets = data.results;
+					newTweets(data);
+
+					setTimeout(function() {
+						startedAt = new Date();
+						$('#audio').hide();
+						//$('#tweet').hide();
+						play = true;
+					}, 100);
+		        }
+		    });
+		}; //downloadTweets
+
+		//downloadTweets();
+
+		setTimeout(downloadTweets, 0);
+		setTimeout(downloadTweets, 3000);
 		
 	}// main code (else if bad browser)
 });
