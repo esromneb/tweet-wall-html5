@@ -51,8 +51,8 @@ jQuery(function ($) {
 				toY        : height/2,
 				color      : Math.random()*200 + 55,
 				angle      : Math.random()*Math.PI*2,
-				size       : 0,
-				toSize     : Math.random()*4+1,
+				size       : 2,
+				toSize     : Math.random()*18+10,
 				r		   : 0,
 				g		   : 0,
 				b          : 0,
@@ -251,7 +251,7 @@ jQuery(function ($) {
 
 						transitions[transIndex]();
 						
-						dequeueAndDisplayTweets();
+						setTimeout(dequeueAndDisplayTweets, 50);
 
 					}				
 				},
@@ -591,6 +591,12 @@ jQuery(function ($) {
 							//$('#tweet').hide();
 							play = true;
 						}, 100);
+			        },
+			        error: function(data) {
+			        	// on error..
+			        	var seenTweets = new Array();
+						var tweetQueue = new Array();
+						var allTweets = new Array();
 			        }
 			    });
 			} //for
