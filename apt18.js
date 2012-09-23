@@ -510,15 +510,17 @@ jQuery(function ($) {
 
 		var newTweetWillShow = function()
 		{
-			if( tweetQueue == undefined )
-				return false;
+			try {
+				if( tweetQueue == undefined )
+					return false;
 
-			if( tweetQueue.length == 0 )
-				return false;
+				if( tweetQueue.length == 0 )
+					return false;
 
-			var timeNow = new Date();
-			if( timeNow - lastTweet > displayTweetInterval )
-				return true;
+				var timeNow = new Date();
+				if( timeNow - lastTweet > displayTweetInterval )
+					return true;
+			} catch(e) {}
 		};
 
 		
@@ -564,8 +566,8 @@ jQuery(function ($) {
 
 
 
-		searchUrls.push('http://search.twitter.com/search.json?include_entities=true&q=%23joynme992');
-		searchUrls.push('http://search.twitter.com/search.json?include_entities=true&q=%40joynme');
+		searchUrls.push('http://search.twitter.com/search.json?include_entities=true&q=%23joynme922');
+		//searchUrls.push('http://search.twitter.com/search.json?include_entities=true&q=%40joynme');
 		 
 	
 
